@@ -88,12 +88,15 @@ static ssize_t example_write_dma(struct file *file, const char *data, size_t len
   int cookie = dmaengine_submit(desc);
   int retr = dma_submit_error(cookie);
   printk(KERN_INFO"ret %d, cookie %d\n", retr, cookie);
+  //writel(0x2, state->regs + 0x48);
 
+  //state->chan->device->device_issue_pending(state->chan);
   dma_async_issue_pending(state->chan);
   printk(KERN_INFO"issued, nap time\n");
 
-  msleep(10000);
+  msleep(100);
   printk(KERN_INFO"nap done\n");
+  //writel(0x0, state->regs + 0x48);
 done:
   //dma_free_coherent(dev, len, buffer, dma);
   dma_free_noncoherent(dev, len, buffer, dma, DMA_TO_DEVICE);
@@ -115,8 +118,8 @@ static int example_probe(struct platform_device *pdev) {
   struct device * dev = &pdev->dev;
   struct resource *mem;
   struct dma_slave_config tx_conf = {
-    .dst_addr_width = DMA_SLAVE_BUSWIDTH_4_BYTES,
-    .src_addr_width = DMA_SLAVE_BUSWIDTH_4_BYTES,
+    .dst_addr_width = DMA_SLAVE_BUSWIDTH_1_BYTE,
+//    .src_addr_width = DMA_SLAVE_BUSWIDTH_4_BYTES,
     .direction = DMA_MEM_TO_DEV,
     .dst_maxburst = 4,
     .dst_port_window_size = 1,
